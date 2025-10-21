@@ -1,14 +1,41 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <!-- Packaging / metadata -->
+    <IsPackable>true</IsPackable>
+    <Company>LowlandTech</Company>
+    <Authors>wendellmva</Authors>
+    <Copyright>Copyright © 2025 LowlandTech</Copyright>
+    <!-- Versioning (update as appropriate) -->
+    <Version>2025.10.2</Version>
+    <PackageVersion>2025.10.2</PackageVersion>
+    <PackageId>LowlandTech.Plugins</PackageId>
+    <Title>LowlandTech.Plugins</Title>
+    <Description>Plugin discovery, registration and lifecycle helpers for LowlandTech projects.</Description>
+    <PackageTags>plugins,dependency injection,lamar,lowlandtech</PackageTags>
+    <RepositoryUrl>https://github.com/lowlandtech/lowlandtech.plugins</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <!-- Repro packaging -->
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IncludeSource>true</IncludeSource>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <PackageReference Include="Ardalis.GuardClauses" Version="5.0.0" />
     <PackageReference Include="Lamar" Version="15.0.1" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="../../icon.png" Pack="true" PackagePath="" Condition="Exists('../../icon.png')" />
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 </Project>
