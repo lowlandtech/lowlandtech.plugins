@@ -1,0 +1,275 @@
+# --------------------------------------------------------------------
+# Feature: Error Handling and Edge Cases
+# --------------------------------------------------------------------
+
+@VCHIP-0010 @UC06 @Plugin @ErrorHandling
+Feature: Error Handling and Edge Cases
+  As a developer using the LowlandTech Plugin Framework
+  I want the framework to handle errors gracefully
+  So that my application remains stable even when plugins fail
+
+  Background:
+    Given the plugin framework is initialized
+    And error handling mechanisms are in place
+
+  @SC01
+  Scenario: Handle plugin assembly load failure
+    Given a plugin assembly path is invalid
+    When the framework attempts to load the assembly
+    Then an assembly load exception should be caught
+    And an error should be logged with assembly path details
+    And the application should continue running
+    And other plugins should still be loaded
+
+  Scenario: Handle corrupted plugin assembly
+    Given a plugin assembly file is corrupted
+    When the framework attempts to load the assembly
+    Then a BadImageFormatException should be caught
+    And an error should be logged indicating corrupted assembly
+    And the plugin should be skipped
+    And the application should remain stable
+
+  Scenario: Handle plugin with missing dependencies
+    Given a plugin assembly has unresolved dependencies
+    When the framework attempts to instantiate the plugin
+    Then a FileNotFoundException or ReflectionTypeLoadException should occur
+    And the error should clearly indicate the missing dependency
+    And the plugin should fail to load
+    And other plugins should not be affected
+
+  Scenario: Handle plugin constructor exception
+    Given a plugin constructor throws an exception
+    When Activator.CreateInstance attempts to create the plugin
+    Then the inner exception should be captured
+    And the error should be logged with plugin type information
+    And the plugin should not be registered
+    And the application should continue
+
+  Scenario: Handle plugin Install method exception
+    Given a plugin Install method throws an exception
+    When the Install method is called during registration
+    Then the exception should be propagated or caught based on policy
+    And the error should be logged with plugin name and stack trace
+    And the service collection may be in a partial state
+    And appropriate cleanup or rollback should occur if supported
+
+  Scenario: Handle plugin ConfigureContext exception
+    Given a plugin ConfigureContext method throws an exception
+    When the async ConfigureContext is awaited
+    Then the exception should be captured
+    And the error should be logged
+    And the plugin should not proceed to Configure phase
+
+  Scenario: Handle plugin Configure method exception
+    Given a plugin Configure method throws an exception
+    When UsePlugins iterates through plugins
+    Then the exception should be caught or propagated
+    And the error should be logged with plugin details
+    And the error handling strategy should be determined by configuration
+
+  Scenario: Handle circular dependency in plugin services
+    Given Plugin A depends on Service B
+    And Service B depends on Service A
+    When the service provider attempts to resolve the circular dependency
+    Then a circular dependency exception should be thrown
+    And the error message should indicate the dependency chain
+    And the application should fail to start or handle gracefully
+
+  Scenario: Handle plugin with abstract Install method not implemented
+    Given a plugin class inherits from Plugin base class
+    But does not implement the abstract Install method
+    When the compiler processes the plugin
+    Then a compilation error should occur
+    And the plugin should not build
+    And the error should clearly state Install must be implemented
+
+  Scenario: Handle plugin with abstract Configure method not implemented
+    Given a plugin class inherits from Plugin base class
+    But does not implement the abstract Configure method
+    When the compiler processes the plugin
+    Then a compilation error should occur
+    And the plugin should not build
+    And the error should clearly state Configure must be implemented
+
+  Scenario: Handle null service collection
+    Given a null IServiceCollection is passed to AddPlugin
+    When the method attempts to register the plugin
+    Then a NullReferenceException or ArgumentNullException should be thrown
+    And the error should clearly indicate the null parameter
+
+  Scenario: Handle null plugin instance
+    Given a null plugin instance is passed to AddPlugin
+    When the guard clause checks the plugin
+    Then an ArgumentNullException should be thrown
+    And the parameter name should be included in the exception
+    And the plugin should not be registered
+
+  Scenario: Handle plugin with empty or whitespace Name
+    Given a plugin is registered with an empty Name property
+    When the plugin is loaded from configuration
+    Then a validation warning should be logged
+    And the plugin might use a default name
+    And the plugin should still function if Name is not critical
+
+  Scenario: Handle plugin with duplicate Name
+    Given two plugins have the same Name property
+    When both plugins are registered
+    Then both should be registered if Id is unique
+    And the duplicate name should be logged as a warning
+    And the unique identifier should be used to differentiate them
+
+  Scenario: Handle plugin with IsActive set to false after registration
+    Given a plugin is registered with IsActive = true
+    When the IsActive property is changed to false at runtime
+    Then the plugin behavior depends on implementation
+    And changing IsActive at runtime may not affect already-configured plugins
+    And proper handling should be documented
+
+  Scenario: Handle missing configuration file
+    Given the appsettings.json file does not exist
+    When the application attempts to load plugin configuration
+    Then the configuration should return empty or default values
+    And no plugins should be loaded from configuration
+    And the application should continue without errors
+
+  Scenario: Handle malformed JSON in configuration
+    Given the appsettings.json contains invalid JSON syntax
+    When the configuration is parsed
+    Then a JsonException should be thrown
+    And the error should indicate the JSON parsing failure
+    And the application should fail to start with a clear error message
+
+  Scenario: Handle invalid PluginId GUID format
+    Given a PluginId attribute contains an invalid GUID string
+    When the plugin is loaded
+    Then the Id should be treated as a string
+    And the framework should validate the format appropriately
+    And the error should indicate the invalid format if validation fails
+
+  Scenario: Handle plugin that takes too long to configure
+    Given a plugin Configure method has an infinite loop or very long operation
+    When UsePlugins calls Configure on the plugin
+    Then the application may hang waiting for the plugin
+    And timeout mechanisms should be considered for production
+    And monitoring should detect hanging plugins
+
+  Scenario: Handle plugin attempting to register duplicate route
+    Given Plugin A registers a /api/data route
+    And Plugin B also attempts to register /api/data route
+    When both plugins configure their routes
+    Then a route conflict exception should be thrown
+    And the error should clearly indicate the duplicate route
+    And the application should fail to start or handle the conflict
+
+  Scenario: Handle plugin with version mismatch
+    Given a plugin is built against framework version 1.0
+    And the application uses framework version 2.0 with breaking changes
+    When the plugin is loaded
+    Then compatibility errors may occur at load time or runtime
+    And version compatibility should be checked and documented
+    And appropriate error messages should guide users
+
+  Scenario: Handle reflection failure during type discovery
+    Given a plugin assembly contains types that cannot be loaded via reflection
+    When GetTypes() is called on the assembly
+    Then a ReflectionTypeLoadException may be thrown
+    And the LoaderExceptions should be examined for details
+    And types that can be loaded should still be processed
+
+  Scenario: Handle case-sensitive file system issues
+    Given a plugin name is "MyPlugin" in configuration
+    But the actual file is "myplugin.dll" on a case-sensitive file system
+    When the framework attempts to load the plugin
+    Then a FileNotFoundException should occur
+    And the error should indicate the case mismatch
+    And the configuration should match exact file name casing
+
+  Scenario: Handle plugin assembly locked by another process
+    Given a plugin assembly file is locked by another process
+    When the framework attempts to load the assembly
+    Then an IOException should occur
+    And the error should indicate the file is in use
+    And the application should fail to load that plugin
+
+  Scenario: Handle plugin with insufficient permissions
+    Given the application runs with limited file system permissions
+    And a plugin assembly is in a restricted directory
+    When the framework attempts to load the assembly
+    Then an UnauthorizedAccessException should occur
+    And the error should indicate permission denied
+    And appropriate error logging should occur
+
+  Scenario: Handle plugin service registration conflict
+    Given Plugin A registers IService with ImplementationA
+    And Plugin B registers IService with ImplementationB
+    When both plugins install their services
+    Then the behavior depends on DI container rules (last registration wins or multi-registration)
+    And the conflict should be logged or documented
+    And developers should be aware of service registration order
+
+  Scenario: Handle plugin with no parameterless constructor
+    Given a plugin class has a constructor requiring parameters
+    When Activator.CreateInstance attempts to instantiate the plugin
+    Then a MissingMethodException should be thrown
+    And the error should indicate no parameterless constructor found
+    And the plugin should fail to load
+
+  Scenario: Handle empty Assemblies collection
+    Given a plugin has an empty Assemblies collection
+    When the plugin needs to reference its assemblies
+    Then the collection should be safely enumerable
+    And no null reference exceptions should occur
+    And the plugin should handle the empty collection gracefully
+
+  Scenario: Handle plugin unregistration
+    Given a plugin is registered and configured
+    When an attempt is made to unregister or remove the plugin at runtime
+    Then the framework behavior should be documented
+    And proper cleanup should occur if plugin removal is supported
+
+  Scenario: Handle plugin logging when ILogger is not available
+    Given the plugin framework attempts to log messages
+    And ILogger is not configured in the DI container
+    When logging is attempted
+    Then a NullLogger should be used as fallback
+    And the logger resolution should fail gracefully
+    And the application should not crash due to missing logger
+
+  Scenario: Handle async exceptions in ConfigureContext
+    Given a plugin ConfigureContext method has an async operation that fails
+    When the Task is awaited
+    Then the exception should be properly propagated
+    And AggregateException should be unwrapped if present
+    And the original exception should be logged
+
+  Scenario: Handle plugin metadata with special characters
+    Given a plugin has metadata with special characters:
+      | Property    | Value                                    |
+      | Name        | My<Plugin>& "Special" 'Chars'            |
+      | Description | Line1\nLine2\tTab                        |
+    When the plugin metadata is stored or serialized
+    Then special characters should be properly escaped
+    And JSON serialization should handle the characters correctly
+    And no injection vulnerabilities should exist
+
+  Scenario: Handle very large number of plugins
+    Given 1000 plugins are configured
+    When all plugins are loaded and configured
+    Then the framework should handle the load
+    And performance should remain acceptable
+    And memory usage should be monitored
+    And no overflow or stack issues should occur
+
+  Scenario: Handle plugin assembly in non-standard location
+    Given a plugin assembly is in a custom directory outside the application folder
+    When the assembly path is specified
+    Then the framework should support absolute paths
+    And the assembly should load from the custom location
+    And security considerations should be documented
+
+  Scenario: Handle plugin throwing exception from property getter
+    Given a plugin property getter throws an exception
+    When the property is accessed during plugin processing
+    Then the exception should be caught and logged
+    And the plugin should be skipped or default value used
+    And the application should remain stable
