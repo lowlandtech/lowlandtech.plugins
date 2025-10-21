@@ -124,6 +124,29 @@ Run it:
 2) Test: `dotnet test` (or filter, e.g., `--filter "VCHIP-0010-UC04"`)
 3) Run sample API: `dotnet run --project samples/lowlandtech.sample.api`
 
+## Local build & packaging
+
+This repository includes `build.ps1`, a helper to bump versions, build, and pack projects to a local folder for consumption by other local projects.
+
+Basic usage (pack core projects to C:\Workspaces\Packages):
+
+- Pack both main libraries and write packages to the local folder:
+  `.uild.ps1 -ProjectFile all -OutputPath 'C:\Workspaces\Packages'`
+
+- Pack a single project (e.g. AspNetCore integration):
+  `.uild.ps1 -ProjectFile 'src\LowlandTech.Plugins.AspNetCore\LowlandTech.Plugins.AspNetCore.csproj'`
+
+- Increment the minor version while packing:
+  `.uild.ps1 -VersionIncrement Minor`
+
+Notes
+- The script updates `Version` / `PackageVersion` in the specified .csproj files. Commit the changes if you want them recorded in git.
+- The default output path is `C:\Workspaces\Packages`; clear that folder before running the script if you want only the freshly-produced packages:
+  `Remove-Item 'C:\Workspaces\Packages\*' -Force`
+- If you prefer not to produce symbol packages (`.snupkg`), either remove `IncludeSymbols` / `SymbolPackageFormat` from the project file(s) or adjust the pack step to suppress symbols.
+
+This section provides a quick way to publish local NuGet packages for downstream development and CI validation.
+
 ## Contributing
 
 - Follow the test-first style in `tests/` and keep changes small.
@@ -136,3 +159,4 @@ See `LICENSE` for details.
 ## Contact
 
 Repo: https://github.com/lowlandtech/lowlandtech.plugins
+
