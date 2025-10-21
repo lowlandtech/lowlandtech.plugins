@@ -13,5 +13,5 @@ public class PluginOptions
     /// <summary>
     /// Sets the plugins.
     /// </summary>
-    public List<PluginConfig> Plugins { get; set; } = [];
+    public List<PluginConfig> Plugins { get; set; } = new List<PluginConfig>();
 }

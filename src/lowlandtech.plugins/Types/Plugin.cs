@@ -1,10 +1,30 @@
-﻿namespace LowlandTech.Plugins.Types;
+﻿using System.Reflection;
+using System.Text.Json.Serialization;
+
+namespace LowlandTech.Plugins.Types;
 
 /// <summary>
 /// Base class for a plugin.
 /// </summary>
 public abstract class Plugin : IPlugin
 {
+    protected Plugin()
+    {
+        // If a PluginId attribute exists on the concrete type, use it to set the Id.
+        var attr = Attribute.GetCustomAttribute(this.GetType(), typeof(PluginId)) as PluginId;
+        if (attr is not null && System.Guid.TryParse(attr.Id, out var g))
+        {
+            Id = g;
+        }
+        else
+        {
+            Id = System.Guid.Empty; // keep default empty unless attribute present
+        }
+
+        Name = this.GetType().Name;
+        Assemblies = new List<Assembly>();
+    }
+
     /// <summary>
     /// Gets the identifier.
     /// </summary>
@@ -23,32 +43,32 @@ public abstract class Plugin : IPlugin
     /// <summary>
     /// Gets the description.
     /// </summary>
-    public string? Description { get; } = null;
+    public string? Description { get; } = string.Empty;
 
     /// <summary>
     /// Gets the company.
     /// </summary>
-    public string? Company { get; } = null;
+    public string? Company { get; } = string.Empty;
 
     /// <summary>
     /// Gets the company URL.
     /// </summary>
-    public string? Copyright { get; } = null;
+    public string? Copyright { get; } = string.Empty;
 
     /// <summary>
     /// Gets the URL.
     /// </summary>
-    public string? Url { get; } = null;
+    public string? Url { get; } = string.Empty;
 
     /// <summary>
     /// Gets the version.
     /// </summary>
-    public string? Version { get; } = null;
+    public string? Version { get; } = string.Empty;
 
     /// <summary>
     /// Gets the authors.
     /// </summary>
-    public string? Authors { get; } = null;
+    public string? Authors { get; } = string.Empty;
 
     /// <summary>
     /// Gets the assemblies.

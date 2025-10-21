@@ -2,7 +2,10 @@
   "permissions": {
     "allow": [
       "Bash(mkdir:*)",
-      "Bash(cat:*)"
+      "Bash(cat:*)",
+      "Bash(dotnet build:*)",
+      "Bash(dotnet test:*)",
+      "Bash(ls \"C:\\Workspaces\\lowlandtech.plugins\\tests\\lowlandtech.plugins.tests\\VCHIP_0010_Plugins\\UC01_AspNetCore\"\" | grep \"^SC \")"
     ],
     "deny": [],
     "ask": []
