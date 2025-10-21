@@ -1,17 +1,40 @@
-﻿<Project Sdk="Microsoft.NET.Sdk">
-
+<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
     <TargetFramework>net9.0</TargetFramework>
     <ImplicitUsings>enable</ImplicitUsings>
     <Nullable>enable</Nullable>
+    <IsPackable>true</IsPackable>
+    <Company>LowlandTech</Company>
+    <Authors>wendellmva</Authors>
+    <Copyright>Copyright © 2025 LowlandTech</Copyright>
+    <Version>2025.10.4</Version>
+    <PackageVersion>2025.10.4</PackageVersion>
+    <PackageId>LowlandTech.Plugins.AspNetCore</PackageId>
+    <Title>LowlandTech.Plugins.AspNetCore</Title>
+    <Description>ASP.NET Core integrations for LowlandTech.Plugins</Description>
+    <PackageTags>plugins,aspnetcore,lamar,lowlandtech</PackageTags>
+    <RepositoryUrl>https://github.com/lowlandtech/lowlandtech.plugins</RepositoryUrl>
+    <RepositoryType>git</RepositoryType>
+    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageIcon>icon.png</PackageIcon>
+    <PackageReadmeFile>README.md</PackageReadmeFile>
+    <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
+    <Deterministic>true</Deterministic>
+    <EmbedUntrackedSources>true</EmbedUntrackedSources>
+    <PublishRepositoryUrl>true</PublishRepositoryUrl>
+    <IncludeSymbols>true</IncludeSymbols>
+    <SymbolPackageFormat>snupkg</SymbolPackageFormat>
+    <IncludeSource>true</IncludeSource>
+    <GenerateDocumentationFile>true</GenerateDocumentationFile>
   </PropertyGroup>
-
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
   </ItemGroup>
-
   <ItemGroup>
     <ProjectReference Include="..\lowlandtech.plugins\LowlandTech.Plugins.csproj" />
   </ItemGroup>
-
+  <ItemGroup>
+    <None Include="../../icon.png" Pack="true" PackagePath="" Condition="Exists('../../icon.png')" />
+    <None Include="../../README.md" Pack="true" PackagePath="" />
+  </ItemGroup>
 </Project>
