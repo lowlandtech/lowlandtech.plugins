@@ -25,7 +25,7 @@ public class AssembliesAwarePlugin : Plugin
         return Task.CompletedTask;
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         AssembliesAvailableInConfigure = Assemblies is not null && Assemblies.Any();
         return Task.CompletedTask;

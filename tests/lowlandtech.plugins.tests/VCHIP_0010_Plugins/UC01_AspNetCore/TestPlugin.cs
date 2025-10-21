@@ -18,10 +18,10 @@ public class TestPlugin : Plugin
         services.AddSingleton<TestService>();
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         ConfigureCalled = true;
-        ConfigureServiceProvider = container;
+        ConfigureServiceProvider = provider;
         ConfigureHost = host;
 
         if (host is WebApplication app)

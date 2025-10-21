@@ -14,26 +14,26 @@ public sealed class SC04_UsePluginsOnIContainer : WhenTestingForV2<ErrorHandling
 {
     private ServiceRegistry? _services;
     private IContainer? _container;
-    private TestLifecyclePlugin? _plugin;
+    private TestLifecyclePluginLamar? _plugin;
 
     protected override ErrorHandlingTestFixture For() => new();
 
     protected override void Given()
     {
         _services = new ServiceRegistry();
-        _plugin = new TestLifecyclePlugin();
+        _plugin = new TestLifecyclePluginLamar();
         _services.AddPlugin(_plugin);
     }
 
     protected override void When()
     {
         _container = new Container(_services);
-        _container.UsePlugins();
+        _container.UsePlugins().GetAwaiter().GetResult();
     }
 
     [Fact]
     [Then("all registered plugins should be retrieved from the container", "UAC010")]
-    public void Plugins_Retrieved() => _container!.GetAllInstances<IPlugin>().ShouldNotBeNull().ShouldBeEmpty();
+    public void Plugins_Retrieved() => _container!.GetAllInstances<IPlugin>().ShouldNotBeNull().ShouldNotBeEmpty();
 
     [Fact]
     [Then("the Configure method should be called on each plugin", "UAC011")]

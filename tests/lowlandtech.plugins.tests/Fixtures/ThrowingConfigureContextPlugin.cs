@@ -18,7 +18,7 @@ public class ThrowingConfigureContextPlugin : Plugin
         throw new InvalidOperationException("ConfigureContext failed");
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         ConfigureCalled = true;
         return Task.CompletedTask;

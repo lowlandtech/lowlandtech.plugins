@@ -77,7 +77,13 @@ public abstract class Plugin : IPlugin
     /// Installs the plugin.
     /// </summary>
     /// <param name="services"></param>
-    public abstract void Install(IServiceCollection services);
+    public virtual void Install(IServiceCollection services){}
+
+    /// <summary>
+    /// Installs the plugin.
+    /// </summary>
+    /// <param name="services"></param>
+    public virtual void Install(ServiceRegistry services){}
 
     /// <summary>
     /// Configures the service collection for the current context.
@@ -95,7 +101,20 @@ public abstract class Plugin : IPlugin
     /// <summary>
     /// Configures the plugin.
     /// </summary>
+    /// <param name="provider"></param>
+    /// <param name="host"></param>
+    public virtual Task Configure(IServiceProvider provider, object? host = null)
+    {
+        return Task.CompletedTask;
+    }
+
+    /// <summary>
+    /// Configures the plugin.
+    /// </summary>
     /// <param name="container"></param>
     /// <param name="host"></param>
-    public abstract Task Configure(IServiceProvider container, object? host = null);
+    public virtual Task Configure(IContainer container, object? host = null)
+    {
+        return Task.CompletedTask;
+    }
 }

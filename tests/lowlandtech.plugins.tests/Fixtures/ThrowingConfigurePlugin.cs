@@ -13,7 +13,7 @@ public class ThrowingConfigurePlugin : Plugin
         return Task.CompletedTask;
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         throw new InvalidOperationException("Configure failed");
     }

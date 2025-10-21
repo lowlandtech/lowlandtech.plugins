@@ -14,14 +14,14 @@ public sealed class SC02_AddSpecificPluginInstance : WhenTestingForV2<ErrorHandl
 {
     private ServiceRegistry? _services;
     private IContainer? _container;
-    private TestLifecyclePlugin? _plugin;
+    private TestLifecyclePluginLamar? _plugin;
 
     protected override ErrorHandlingTestFixture For() => new();
 
     protected override void Given()
     {
         _services = new ServiceRegistry();
-        _plugin = new TestLifecyclePlugin();
+        _plugin = new TestLifecyclePluginLamar();
     }
 
     protected override void When()
@@ -40,5 +40,5 @@ public sealed class SC02_AddSpecificPluginInstance : WhenTestingForV2<ErrorHandl
 
     [Fact]
     [Then("the plugin should be available in the container", "UAC006")]
-    public void Plugin_Available_In_Container() => _container!.GetAllInstances<IPlugin>().ShouldNotBeNull().ShouldBeEmpty();
+    public void Plugin_Available_In_Container() => _container!.GetAllInstances<IPlugin>().ShouldNotBeNull().ShouldNotBeEmpty();
 }

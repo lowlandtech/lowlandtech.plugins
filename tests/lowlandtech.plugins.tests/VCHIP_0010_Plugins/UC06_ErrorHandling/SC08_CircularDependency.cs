@@ -24,7 +24,7 @@ public class CircularDependencyPluginA : Plugin
         services.AddScoped<CircularServiceA>();
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null) => Task.CompletedTask;
+    public override Task Configure(IServiceProvider provider, object? host = null) => Task.CompletedTask;
 }
 
 [PluginId("ea888888-0000-4000-8000-000000000008")]
@@ -35,7 +35,7 @@ public class CircularDependencyPluginB : Plugin
         services.AddScoped<CircularServiceB>();
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null) => Task.CompletedTask;
+    public override Task Configure(IServiceProvider provider, object? host = null) => Task.CompletedTask;
 }
 
 [Scenario(

@@ -9,7 +9,7 @@ public class FrontendDiscoveryPlugin : Plugin
         // Test stub - no services to install
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         return Task.CompletedTask;
     }
@@ -23,7 +23,7 @@ public class ReportingDiscoveryPlugin : Plugin
         // Test stub - no services to install
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         return Task.CompletedTask;
     }

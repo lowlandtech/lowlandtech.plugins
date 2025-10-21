@@ -74,9 +74,9 @@ Feature: Lamar Container Integration
   Scenario: Plugin with Lamar-specific features
     Given a plugin uses Lamar's advanced registration features
     When the plugin Install method uses ServiceRegistry features like:
-      - Policies
-      - Interceptors
-      - Decorated instances
+      And Policies
+      And Interceptors
+      And Decorated instances
     Then the Lamar-specific features should work correctly                             # UAC020
     And the plugin should integrate seamlessly                                         # UAC021
 

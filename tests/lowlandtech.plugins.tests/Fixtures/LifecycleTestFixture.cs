@@ -31,7 +31,7 @@ public class ThrowingInstallPlugin : Plugin
         throw new InvalidOperationException("Install failed");
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         return Task.CompletedTask;
     }

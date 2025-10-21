@@ -9,7 +9,7 @@ public class BackendPlugin : Plugin
         services.AddSingleton<BackendActivity>();
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         if (host is null) return Task.CompletedTask;
 

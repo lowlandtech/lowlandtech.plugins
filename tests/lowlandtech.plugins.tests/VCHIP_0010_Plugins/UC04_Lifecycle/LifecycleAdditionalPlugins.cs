@@ -14,7 +14,7 @@ public class ThrowingConfigurePlugin : Plugin
         return Task.CompletedTask;
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         throw new InvalidOperationException("Configure failed");
     }
@@ -47,7 +47,7 @@ public class MetadataPlugin : Plugin
         return Task.CompletedTask;
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         return Task.CompletedTask;
     }
@@ -69,7 +69,7 @@ public class IndependentPlugin : Plugin
     }
 
     public override Task ConfigureContext(IServiceCollection services) => Task.CompletedTask;
-    public override Task Configure(IServiceProvider container, object? host = null) => Task.CompletedTask;
+    public override Task Configure(IServiceProvider provider, object? host = null) => Task.CompletedTask;
 }
 
 // Plugin that checks Assemblies collection availability
@@ -91,7 +91,7 @@ public class AssembliesAwarePlugin : Plugin
         return Task.CompletedTask;
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         AssembliesAvailableInConfigure = Assemblies is not null && Assemblies.Count > 0;
         return Task.CompletedTask;

@@ -54,13 +54,13 @@ public class SC06_ValidatePluginIdUnique : WhenTestingForV2<ValidationTestFixtur
 [PluginId("306b92e3-2db6-45fb-99ee-9c63b090f3fc")]
 public class BackendPlugin : Plugin
 {
-    public override Task Configure(IServiceProvider container, object? host = null) => Task.CompletedTask;
+    public override Task Configure(IServiceProvider provider, object? host = null) => Task.CompletedTask;
     public override void Install(IServiceCollection services) { }
 }
 
 [PluginId("4a8c6f2e-1b3d-4e5f-9a7c-8d6e5f4a3b2c")]
 public class FrontendPlugin : Plugin
 {
-    public override Task Configure(IServiceProvider container, object? host = null) => Task.CompletedTask;
+    public override Task Configure(IServiceProvider provider, object? host = null) => Task.CompletedTask;
     public override void Install(IServiceCollection services) { }
 }

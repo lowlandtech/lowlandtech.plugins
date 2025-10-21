@@ -65,7 +65,7 @@ public class DerivedPlugin : Plugin
         // minimal install implementation
     }
 
-    public override Task Configure(System.IServiceProvider container, object? host = null)
+    public override Task Configure(System.IServiceProvider provider, object? host = null)
     {
         return Task.CompletedTask;
     }

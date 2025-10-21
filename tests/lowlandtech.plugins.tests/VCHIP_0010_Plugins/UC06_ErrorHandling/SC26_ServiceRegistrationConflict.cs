@@ -11,7 +11,7 @@ public class ServiceConflictPluginA : Plugin
     {
         services.AddSingleton<ITestService, TestServiceImplA>();
     }
-    public override Task Configure(IServiceProvider container, object? host = null) => Task.CompletedTask;
+    public override Task Configure(IServiceProvider provider, object? host = null) => Task.CompletedTask;
 }
 
 [PluginId("f2222222-0000-4000-8000-000000000002")]
@@ -21,7 +21,7 @@ public class ServiceConflictPluginB : Plugin
     {
         services.AddSingleton<ITestService, TestServiceImplB>();
     }
-    public override Task Configure(IServiceProvider container, object? host = null) => Task.CompletedTask;
+    public override Task Configure(IServiceProvider provider, object? host = null) => Task.CompletedTask;
 }
 
 [Scenario(

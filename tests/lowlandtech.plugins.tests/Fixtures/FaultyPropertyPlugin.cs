@@ -8,7 +8,7 @@ public class FaultyPropertyPlugin : Plugin
 {
     public override void Install(IServiceCollection services) { }
     
-    public override Task Configure(IServiceProvider container, object? host = null) => Task.CompletedTask;
+    public override Task Configure(IServiceProvider provider, object? host = null) => Task.CompletedTask;
 
     // Hide base Name property and simulate a throwing getter
     public new string Name => throw new InvalidOperationException("Property getter failed");

@@ -71,7 +71,7 @@ public interface IPlugin
     /// <summary>
     /// Configures the plugin.
     /// </summary>
-    /// <param name="container">The ioc container.</param>
+    /// <param name="provider">The ioc provider.</param>
     /// <param name="host">The webapplication or mauiapp</param>
-    Task Configure(IServiceProvider container, object? host = null);
+    Task Configure(IServiceProvider provider, object? host = null);
 }

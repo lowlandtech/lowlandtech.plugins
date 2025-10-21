@@ -19,7 +19,7 @@ public class DefaultConfigureContextPlugin : Plugin
 
     // Note: no override for ConfigureContext -> default implementation used
 
-    public override async Task Configure(IServiceProvider container, object? host = null)
+    public override async Task Configure(IServiceProvider provider, object? host = null)
     {
         try
         {

@@ -85,7 +85,7 @@ public class BackendTestPlugin : Plugin
 
     public override void Install(IServiceCollection services) { }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         ConfigureCalled = true;
         ReceivedHost = host;
@@ -105,7 +105,7 @@ public class FrontendTestPlugin : Plugin
 
     public override void Install(IServiceCollection services) { }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         ConfigureCalled = true;
         ReceivedHost = host;
@@ -125,7 +125,7 @@ public class ApiTestPlugin : Plugin
 
     public override void Install(IServiceCollection services) { }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         ConfigureCalled = true;
         ReceivedHost = host;

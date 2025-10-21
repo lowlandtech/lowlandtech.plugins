@@ -54,13 +54,13 @@ public class TestLifecyclePlugin : Plugin
         }
     }
 
-    public override async Task Configure(IServiceProvider container, object? host = null)
+    public override async Task Configure(IServiceProvider provider, object? host = null)
     {
         try
         {
             await Task.Delay(1); // Simulate async work
             ConfigureCalled = true;
-            ServiceProviderReceived = container;
+            ServiceProviderReceived = provider;
             HostReceived = host;
             OnPhaseExecuted?.Invoke("Configure");
             

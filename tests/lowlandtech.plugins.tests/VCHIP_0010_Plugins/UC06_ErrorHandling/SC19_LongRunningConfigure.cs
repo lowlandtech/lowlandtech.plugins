@@ -15,7 +15,7 @@ public sealed class SC19_LongRunningConfigure : WhenTestingForV2<ErrorHandlingTe
     public class SlowPlugin : Plugin
     {
         public override void Install(IServiceCollection services) { }
-        public override Task Configure(IServiceProvider container, object? host = null)
+        public override Task Configure(IServiceProvider provider, object? host = null)
         {
             // simulate long-running task
             Thread.Sleep(5000);

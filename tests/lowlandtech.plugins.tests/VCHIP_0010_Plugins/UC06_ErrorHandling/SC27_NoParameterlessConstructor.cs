@@ -17,7 +17,7 @@ public sealed class SC27_NoParameterlessConstructor : WhenTestingForV2<ErrorHand
         }
 
         public override void Install(IServiceCollection services) { }
-        public override Task Configure(IServiceProvider container, object? host = null) => Task.CompletedTask;
+        public override Task Configure(IServiceProvider provider, object? host = null) => Task.CompletedTask;
     }
 
     protected override ErrorHandlingTestFixture For() => new();

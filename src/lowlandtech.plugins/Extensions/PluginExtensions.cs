@@ -15,9 +15,27 @@ public static class PluginExtensions
         var pluginId = Guard.Against.MissingPluginId(plugin, nameof(plugin), $"ExtensionPlugin '{plugin.GetType().Name}' does not provide a plugin id.");
 
         // add plugin to the installed plugins list
-        if (services.All(s => s.ServiceType == plugin.GetType())) return;
-        // install plugin
-        plugin.Install(services);
+        // Check if the plugin type is already registered as IPlugin
+        if (services.Any(s => s.ServiceType == typeof(IPlugin) && s.ImplementationType == plugin.GetType())) return;
+        
+        // install plugin - cast to Plugin to ensure ServiceRegistry overload is called
+        if (plugin is Plugin p)
+        {
+            p.Install(services);
+
+            // Track the assembly where the plugin type came from for later reflection or diagnostics
+            try
+            {
+                var asm = plugin.GetType().Assembly;
+                if (asm is not null && !p.Assemblies.Contains(asm)) p.Assemblies.Add(asm);
+            }
+            catch { }
+        }
+        else
+        {
+            plugin.Install(services);
+        }
+        
         services.For<IPlugin>().Add(plugin).Named(pluginId);
     }
 
@@ -27,66 +45,61 @@ public static class PluginExtensions
     /// <param name="services">The service registry</param>
     public static void AddPlugins(this ServiceRegistry services)
     {
-        var provider = services.BuildServiceProvider();
-        var factory = provider.GetRequiredService<ILoggerFactory>();
-        var logger = factory.CreateLogger("LowlandTech.Plugins.Extensions");
-        var configuration = provider.GetRequiredService<IConfiguration>();
-
-        var options = new PluginOptions
-        {
-            Plugins = configuration
-                .GetSection(PluginOptions.Name)
-                .Get<List<PluginConfig>>()!
-        };
+        ILoggerFactory? factory = null;
+        IConfiguration? configuration = null;
+        ILogger logger;
 
         try
         {
-            // Get the currently executing assembly
-            var currentAssembly = Assembly.GetExecutingAssembly();
+            // Use Lamar container to resolve any registrations that were added to the ServiceRegistry
+            using var container = new Container(services);
+            factory = container.TryGetInstance<ILoggerFactory>();
+            configuration = container.TryGetInstance<IConfiguration>();
 
-            // Get the AssemblyLoadContext for the current assembly
-            var loadContext = AssemblyLoadContext.GetLoadContext(currentAssembly)!;
-            var root = Path.Combine(new FileInfo(currentAssembly.Location).DirectoryName!);
-
-            // Attempt to load the assembly
-            foreach (var config in options.Plugins.Where(p => p.IsActive == true))
+            // If no logger factory registered, create a console logger with debug level for troubleshooting
+            if (factory is null)
             {
-
-                var assemblyName = AssemblyName.GetAssemblyName(Path.Combine(root, config.Name + ".dll"));
-
-                if (assemblyName is null) continue;
-
-                var assembly = loadContext.LoadFromAssemblyName(assemblyName);
-
-                // Do something with the loaded assembly
-                logger.LogInformation("Assembly {0} loaded successfully.", assembly.FullName);
-
-                // Get the first type that implements the IPlugin interface
-                var pluginType = assembly.GetTypes().FirstOrDefault(type => typeof(IPlugin).IsAssignableFrom(type));
-
-                if (pluginType is not null)
+                factory = LoggerFactory.Create(builder =>
                 {
-                    // Create an instance of the type
-                    var plugin = (IPlugin)Activator.CreateInstance(pluginType)!;
+                    builder.AddConsole();
+                    builder.SetMinimumLevel(LogLevel.Debug);
+                    builder.AddFilter("LowlandTech.Plugins", LogLevel.Debug);
+                });
+            }
 
-                    // Use the plugin
-                    plugin.Name = config.Name;
-                    plugin.IsActive = config.IsActive;
-                    services.AddPlugin(plugin);
+            logger = factory.CreateLogger("LowlandTech.Plugins.Extensions");
+        }
+        catch
+        {
+            // If building a Lamar container fails for any reason, fall back to a temporary logger factory
+            factory = LoggerFactory.Create(builder =>
+            {
+                builder.AddConsole();
+                builder.SetMinimumLevel(LogLevel.Debug);
+                builder.AddFilter("LowlandTech.Plugins", LogLevel.Debug);
+            });
 
-                    logger.LogInformation("{0}: Found and instantiated", pluginType.FullName);
-                }
-                else
-                {
-                    logger.LogWarning("No type implementing IPlugin found in the assembly.");
-                }
+            logger = factory.CreateLogger("LowlandTech.Plugins.Extensions");
+        }
+
+        // Use the shared discovery service
+        var discoveredPlugins = Services.PluginDiscoveryService.DiscoverPlugins(configuration, logger);
+
+        // Register each discovered plugin
+        foreach (var plugin in discoveredPlugins)
+        {
+            try
+            {
+                services.AddPlugin(plugin);
+            }
+            catch (Exception ex)
+            {
+                logger.LogError(ex, "Error registering plugin {0}", plugin.Name);
             }
         }
-        catch (Exception ex)
-        {
-            // Handle the exception if the assembly cannot be loaded
-            logger.LogError("Error loading assembly: {0}", ex.Message);
-        }
+
+        logger.LogInformation("Plugin registration completed. {Count} plugins registered in ServiceRegistry.",
+            services.Count(s => s.ServiceType == typeof(IPlugin)));
     }
 
 
@@ -95,13 +108,21 @@ public static class PluginExtensions
     /// </summary>
     /// <param name="container">The ioc container</param>
     /// <param name="host">The app host</param>
-    public static void UsePlugins(this IContainer container, object? host = null)
+    public static async Task UsePlugins(this IContainer container, object? host = null)
     {
         var plugins = container.GetAllInstances<IPlugin>();
         // and configure plugins;
         foreach (var plugin in plugins)
         {
-            plugin.Configure(container, host);
+            // Cast to Plugin to ensure IContainer overload is called
+            if (plugin is Plugin p)
+            {
+                await p.Configure(container, host);
+            }
+            else
+            {
+                await plugin.Configure(container, host);
+            }
         }
     }
 

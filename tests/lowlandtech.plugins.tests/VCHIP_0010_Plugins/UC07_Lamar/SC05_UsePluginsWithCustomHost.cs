@@ -14,7 +14,7 @@ public sealed class SC05_UsePluginsWithCustomHost : WhenTestingForV2<ErrorHandli
 {
     private ServiceRegistry? _services;
     private IContainer? _container;
-    private TestLifecyclePlugin? _plugin;
+    private TestLifecyclePluginLamar? _plugin;
     private object? _host;
 
     protected override ErrorHandlingTestFixture For() => new();
@@ -22,7 +22,7 @@ public sealed class SC05_UsePluginsWithCustomHost : WhenTestingForV2<ErrorHandli
     protected override void Given()
     {
         _services = new ServiceRegistry();
-        _plugin = new TestLifecyclePlugin();
+        _plugin = new TestLifecyclePluginLamar();
         _services.AddPlugin(_plugin);
         _container = new Container(_services);
     }
@@ -30,7 +30,7 @@ public sealed class SC05_UsePluginsWithCustomHost : WhenTestingForV2<ErrorHandli
     protected override void When()
     {
         _host = new { Name = "CustomHost" };
-        _container!.UsePlugins(_host);
+        _container!.UsePlugins(_host).GetAwaiter().GetResult();
     }
 
     [Fact]

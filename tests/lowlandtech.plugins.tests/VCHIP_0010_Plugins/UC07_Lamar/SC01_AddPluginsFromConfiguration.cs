@@ -26,14 +26,14 @@ public sealed class SC01_AddPluginsFromConfiguration : WhenTestingForV2<ErrorHan
     {
         _services = new ServiceRegistry();
 
-        // Use the actual assembly name for the test fixtures so discovery finds the plugin
-        var assemblyName = typeof(TestLifecyclePlugin).Assembly.GetName().Name;
+        // Use the specific plugin type name so discovery finds the correct plugin
+        var pluginTypeName = typeof(TestLifecyclePluginLamar).FullName;
 
         var config = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
-            ["Plugins:0:Name"] = assemblyName,
+            ["Plugins:0:Name"] = pluginTypeName,
             ["Plugins:0:IsActive"] = "true",
-            ["Plugins:Plugins:0:Name"] = assemblyName,
+            ["Plugins:Plugins:0:Name"] = pluginTypeName,
             ["Plugins:Plugins:0:IsActive"] = "true"
         }).Build();
 
@@ -68,5 +68,5 @@ public sealed class SC01_AddPluginsFromConfiguration : WhenTestingForV2<ErrorHan
 
     [Fact]
     [Then("the Install method should be called on each plugin", "UAC003")]
-    public void Install_Called_On_Plugins() => (_plugins?.OfType<TestLifecyclePlugin>().Any() == true).ShouldBeTrue();
+    public void Install_Called_On_Plugins() => (_plugins?.OfType<TestLifecyclePluginLamar>().Any() == true).ShouldBeTrue();
 }

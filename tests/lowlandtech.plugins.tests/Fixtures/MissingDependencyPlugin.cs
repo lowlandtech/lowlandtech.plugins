@@ -9,7 +9,7 @@ public class MissingDependencyPlugin : Plugin
         throw new FileNotFoundException("Missing dependency X") ;
     }
 
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         return Task.CompletedTask;
     }

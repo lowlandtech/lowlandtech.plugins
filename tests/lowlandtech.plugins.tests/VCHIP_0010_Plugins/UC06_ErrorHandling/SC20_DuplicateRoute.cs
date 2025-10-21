@@ -41,7 +41,7 @@ public class SimpleRoutePlugin : Plugin
     protected readonly string _route;
     public SimpleRoutePlugin(string route) => _route = route;
     public override void Install(IServiceCollection services) { }
-    public override Task Configure(IServiceProvider container, object? host = null)
+    public override Task Configure(IServiceProvider provider, object? host = null)
     {
         if (host is WebApplication app)
         {
