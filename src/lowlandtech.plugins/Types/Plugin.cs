@@ -1,7 +1,4 @@
-﻿using System.Reflection;
-using System.Text.Json.Serialization;
-
-namespace LowlandTech.Plugins.Types;
+﻿namespace LowlandTech.Plugins.Types;
 
 /// <summary>
 /// Base class for a plugin.
@@ -43,32 +40,32 @@ public abstract class Plugin : IPlugin
     /// <summary>
     /// Gets the description.
     /// </summary>
-    public string? Description { get; protected set; } = string.Empty;
+    public string? Description { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets the company.
     /// </summary>
-    public string? Company { get; protected set; } = string.Empty;
+    public string? Company { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets the company URL.
     /// </summary>
-    public string? Copyright { get; protected set; } = string.Empty;
+    public string? Copyright { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets the URL.
     /// </summary>
-    public string? Url { get; protected set; } = string.Empty;
+    public string? Url { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets the version.
     /// </summary>
-    public string? Version { get; protected set; } = string.Empty;
+    public string? Version { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets the authors.
     /// </summary>
-    public string? Authors { get; protected set; } = string.Empty;
+    public string? Authors { get; set; } = string.Empty;
 
     /// <summary>
     /// Gets the assemblies.

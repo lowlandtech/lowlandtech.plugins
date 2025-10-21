@@ -18,6 +18,11 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <None Remove="LowlandTech.Plugins.Tests.v3.ncrunchproject" />
+    <None Remove="VCHIP_0010_Plugins\UC06_ErrorHandling\ErrorHandlingAndEdgeCases.feature.bak" />
+  </ItemGroup>
+
+  <ItemGroup>
     <PackageReference Include="LowlandTech.Testing.Features" Version="2025.10.2" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" Version="9.0.10" />
     <PackageReference Include="Microsoft.NET.Test.Sdk" Version="18.0.0" />

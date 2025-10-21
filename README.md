@@ -1,159 +1,138 @@
-# LowlandTech.<Feature>
+ï»¿# LowlandTech Plugins
 
-> ?? *Agentic, Spec-Driven Plugin for the LowlandTech Foundry Platform*
+Lightweight, test-driven plugin framework for .NET 9 (C# 13) with first-class ASP.NET Core integration. Build features as independently versioned plugins, discover and load them via configuration, and wire them into your app through a small, well-defined lifecycle.
 
----
+â€” Core contracts live in `src/lowlandtech.plugins`
+â€” ASP.NET Core integration in `src/LowlandTech.Plugins.AspNetCore`
+â€” Samples in `samples/`
+â€” Tests in `tests/`
 
-## ?? Overview
+Supported runtime/tooling
+- .NET 9 (C# 13)
 
-**LowlandTech.<Feature>** is a modular plugin implementing one or more **FlowFeatures** within the LowlandTech ecosystem.
-Each plugin is self-contained — including its backend logic, UI components, Redux events, and BDD specifications — so that both humans and agents can develop, test, and ship features at machine speed.
+## Problem
 
-| Layer            | Description                                                       |
-| ---------------- | ----------------------------------------------------------------- |
-| **Abstractions** | Contracts, Actions, Events, DTOs, and public tool manifests.      |
-| **Domain**       | Pure logic and reducers — no I/O, fully testable in isolation.    |
-| **Backend**      | Request/Handler implementations, EF context, data I/O, reducers.  |
-| **Frontend**     | Blazor components (DynamicComponent-compatible) and UI nodes.     |
-| **Tests**        | Gherkin feature specs (`.feature`), scenario bindings, and fakes. |
+Modern apps need to ship features quickly without turning into tangled monoliths. Teams want to:
+- Add or remove capabilities at runtime without invasive code changes.
+- Keep dependency registration, async initialization, and host wiring predictable.
+- Discover plugins from configuration and load them reliably across environments.
+- Validate plugin identity and avoid conflicts between modules.
 
----
+Doing this consistently with DI, configuration, and host integration is error-prone without a clear contract and lifecycle.
 
-## ?? Design Principles
+## Solution
 
-* **Spec-First Development** — Every feature begins with a `.feature` file (Gherkin) and corresponding scenario tests.
-* **Tri-Part Specs** — Each use case includes:
+LowlandTech Plugins provides:
+- Simple contract: `IPlugin` and a base `Plugin` type with a three-phase lifecycle: `Install`, `ConfigureContext`, `Configure`.
+- Clean integration: `IServiceCollection.AddPlugins()` and `WebApplication.UsePlugins()` for ASP.NET Core; Lamar support is available in the core package.
+- Config-driven discovery: Reads a `Plugins` section from configuration, attempts assembly-by-name or file discovery, and instantiates `IPlugin` types.
+- Safety and consistency: Guarded plugin IDs via `[PluginId]` attribute; duplicate IDs are rejected.
+- Proven by tests: Comprehensive specs under `tests/` for discovery, validation, lifecycle, error handling, and Lamar usage.
 
-  1. Gherkin `.feature` file (`@VCHIP-XXXX` / `@UCXX` / `@SCXX` / `# UACXXX`)
-  2. C# Scenario test class (`[Scenario(...)]`, `GivenAsync/WhenAsync`)
-  3. One `[Then(...,"UACXXX")]` assertion per user acceptance criterion.
-* **Plugin Autonomy** — A plugin can be cloned, tested, and released independently.
-* **Stable Contracts** — Cross-plugin communication happens through Actions, Events, and NodeKinds only.
-* **Agent Compatibility** — Each plugin can be reasoned about, rebuilt, and released by autonomous agents.
+## Example
 
----
-
-## ?? Workspace Integration
-
-This plugin can be registered in your **WorkspaceBuilder** like so:
+1) Define a plugin:
 
 ```csharp
-var ws = WorkspaceBuilder.Create("LowlandTech", "Accounts", db);
+// samples/lowlandtech.sample.backend/BackendPlugin.cs
+using LowlandTech.Plugins;
+using LowlandTech.Plugins.Types;
 
-ws.AddFeature("Registration", "Accounts")
-  .Reducer("RegistrationReducer", r => r
-      .Event("AccountRegistered", e => e
-          .Param("AccountId", PropertyTypes.Guid)
-          .Param("Email", PropertyTypes.String)))
-  .EndReducer()
-  .BuildAndSave();
+[PluginId("306b92e3-2db6-45fb-99ee-9c63b090f3fc")]
+public class BackendPlugin : Plugin
+{
+    public override void Install(IServiceCollection services)
+    {
+        services.AddSingleton<BackendActivity>();
+    }
+
+    public override Task Configure(IServiceProvider container, object? host = null)
+    {
+        if (host is WebApplication app)
+        {
+            app.MapGet("/weatherforecast", () => new[] { "Sunny", "Cloudy" });
+        }
+        return Task.CompletedTask;
+    }
+}
 ```
 
-This ensures deterministic seeding, GUID stability, and full integration with the FlowRegistry.
+2) Configure plugins (optional when adding explicitly):
 
----
-
-## ?? Testing & Specs
-
-Run all BDD specifications with:
-
-```bash
-dotnet test
+```json
+// appsettings.json
+{
+  "Plugins": [
+    { "Name": "LowlandTech.Sample.Backend", "IsActive": true }
+  ]
+}
 ```
 
-Each `.feature` file lives under:
+3) Wire up in ASP.NET Core:
 
-```
-src/plugins/lowlandtech.<feature>.tests/VCHIP-XXXX/
-```
+```csharp
+// samples/lowlandtech.sample.api/Program.cs
+var builder = WebApplication.CreateBuilder(args);
 
-Each scenario test class mirrors its `.feature` name and uses your custom `[Scenario(...)]` attribute.
+// Register by type (explicit)
+builder.Services.AddPlugin<BackendPlugin>();
 
----
+// Or discover from configuration (appsettings.json -> Plugins)
+builder.Services.AddPlugins();
 
-## ?? Plugin Lifecycle
+var app = builder.Build();
 
-| Stage                  | Description                                                                        |
-| ---------------------- | ---------------------------------------------------------------------------------- |
-| **Feature Definition** | Written in `.feature` (spec) and `.cs` (scenario class).                           |
-| **Generation**         | Agents use `FeatureBuilder` / `WorkspaceBuilder` to generate code and test stubs.  |
-| **Implementation**     | Humans or agents complete TODOs inside generated handlers or UI components.        |
-| **Verification**       | `dotnet test` validates `[Then]` assertions for all UACs.                          |
-| **Publication**        | The plugin is versioned and published as a NuGet package (or workspace submodule). |
+// Run plugin Configure(...) against the host
+app.UsePlugins();
 
----
-
-## ?? Agent Tasks
-
-Each plugin includes a `.agents/` folder with work items like:
-
-```
-.agents/
- ??? VCHIP-3010-FlowEventBus/
- ?   ??? Feature.feature
- ?   ??? Scenario.cs
- ?   ??? Workorder.md
+app.Run();
 ```
 
-Agents execute these workorders to complete or regenerate the plugin safely.
+Run it:
+- `dotnet build`
+- `dotnet run --project samples/lowlandtech.sample.api`
 
----
+## Technical Details
 
-## ?? Example Feature Folder Layout
+- Projects
+  - Core: `src/lowlandtech.plugins` â€” `IPlugin`, `Plugin`, options, guards, and Lamar-focused helpers (`ServiceRegistry`, `IContainer`).
+  - ASP.NET Core: `src/LowlandTech.Plugins.AspNetCore` â€” `IServiceCollection.AddPlugins()`, `IServiceCollection.AddPlugin<T>()`, and `WebApplication.UsePlugins()`.
+- Lifecycle (from `src/lowlandtech.plugins/IPlugin.cs`)
+  - `Install(IServiceCollection)` â€” register services.
+  - `ConfigureContext(IServiceCollection)` â€” async context setup (optional).
+  - `Configure(IServiceProvider, object? host)` â€” finalize wiring; `host` can be `WebApplication`.
+- Discovery (`src/LowlandTech.Plugins.AspNetCore/Extensions/PluginExtensions.cs`)
+  - Reads `Plugins` from configuration into `PluginConfig` (`Name`, `IsActive`).
+  - Attempts assembly resolution by name, then searches candidate paths; creates the first concrete `IPlugin` type found.
+  - Assigns `plugin.Name` and `plugin.IsActive`; logs progress; falls back to DLL scan if needed.
+- Registration helpers
+  - ASP.NET Core: `services.AddPlugin(new MyPlugin())`, `services.AddPlugin<MyPlugin>()`, `services.AddPlugins()`; `app.UsePlugins()` to invoke `Configure(...)`.
+  - Lamar (core): `ServiceRegistry.AddPlugin(...)`, `ServiceRegistry.AddPlugins()`, `IContainer.UsePlugins(...)` for scenarios using Lamar.
+- Identity and validation
+  - `[PluginId("<guid>")]` on the plugin type provides a stable ID (`src/lowlandtech.plugins/Types/PluginId.cs`).
+  - `Guard.Against.MissingPluginId(...)` enforces presence and rejects duplicates when adding plugins.
+- Configuration shape
+  - `Plugins: [ { "Name": "<AssemblyOrNamespace>", "IsActive": true } ]`.
+  - Nested `Plugins:Plugins` is tolerated for compatibility in tests.
+- Samples
+  - API host: `samples/lowlandtech.sample.api` (uses `AddPlugins` + `UsePlugins`).
+  - Backend plugin: `samples/lowlandtech.sample.backend` (example plugin with `[PluginId]`).
 
-```
-src/plugins/lowlandtech.accounts/
- ??? abstractions/
- ??? backend/
- ??? domain/
- ??? frontend/
- ??? tests/
- ?   ??? VCHIP-8010/
- ?       ??? EmailVerification.feature
- ?       ??? EmailVerificationScenario.cs
- ??? LowlandTech.Accounts.sln
- ??? README.md
- ??? .agents/
-```
+## Quick Start
 
----
+1) Build: `dotnet build`
+2) Test: `dotnet test` (or filter, e.g., `--filter "VCHIP-0010-UC04"`)
+3) Run sample API: `dotnet run --project samples/lowlandtech.sample.api`
 
-## ?? Coding Standards
+## Contributing
 
-* One `Given` per scenario; multiple `Then`s allowed.
-* Use `[Specification("VCHIP-XXXX-UACXXX")]` for traceability.
-* Never reference spec IDs in production code (only in tests).
-* Prefer deterministic IDs (`GuidV5`) for nodes and features.
-* UI components must expose `data-id="feature-name"` attributes for runtime discovery.
+- Follow the test-first style in `tests/` and keep changes small.
+- Use `@VCHIP-xxxx` annotations in tests for traceability when applicable.
 
----
+## License
 
-## ?? Tooling Notes
+See `LICENSE` for details.
 
-* **IDE:** Visual Studio / VS Code
-* **Language:** .NET 9 (C# 13), Blazor (Server & MAUI)
-* **Patterns:** Redux, Rx.NET, MediatR, FlowEngine, FeatureBuilder
-* **Testing:** BDD (Gherkin), `[Scenario]`, `[Then]`
-* **CI/CD:** GitHub Actions / local agents
+## Contact
 
----
-
-## ?? Next Steps
-
-* [ ] Write the `.feature` specification for your next flow.
-* [ ] Generate code scaffolding via `FeatureBuilder`.
-* [ ] Implement business logic or UI as required.
-* [ ] Validate with `dotnet test`.
-* [ ] Commit with spec ID in the message (e.g., `feat(VCHIP-8010): add email verification flow`).
-
----
-
-## ?? License & Attribution
-
-© 2025 **LowlandTech Foundry**
-Part of the Vylyrian ecosystem.
-Licensed under the LowlandTech Foundry Developer License (LT-FDL).
-
----
-
-> ?? *“In the age of agentic development, every plugin is a mind — and every repo a world.”*
+Repo: https://github.com/lowlandtech/lowlandtech.plugins

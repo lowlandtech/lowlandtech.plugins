@@ -416,6 +416,10 @@ public static class PluginExtensions
     /// <param name="plugin"></param>
     public static void AddPlugin(this IServiceCollection services, IPlugin plugin)
     {
+        // Validate arguments up-front to provide clear exceptions for callers
+        if (services is null) throw new ArgumentNullException(nameof(services));
+        if (plugin is null) throw new ArgumentNullException(nameof(plugin));
+
         var pluginId = Guard.Against.MissingPluginId(plugin, nameof(plugin), $"ExtensionPlugin '{plugin.GetType().Name}' does not provide a plugin id.");
 
         // add plugin to the installed plugins list - check if plugin is already registered by type

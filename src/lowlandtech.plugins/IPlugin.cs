@@ -8,7 +8,7 @@ public interface IPlugin
     /// <summary>
     /// Gets the identifier.
     /// </summary>
-    public Guid Id { get; }
+    public Guid Id { get; set; }
 
     /// <summary>
     /// Gets the name.

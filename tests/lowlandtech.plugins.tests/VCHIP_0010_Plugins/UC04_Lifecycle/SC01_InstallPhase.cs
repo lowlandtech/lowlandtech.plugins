@@ -1,3 +1,5 @@
+using LowlandTech.Plugins.Tests.Fixtures;
+
 namespace LowlandTech.Plugins.Tests.VCHIP_0010_Plugins.UC04_Lifecycle;
 
 [Scenario(
