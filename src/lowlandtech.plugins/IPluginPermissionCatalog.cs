@@ -6,7 +6,7 @@
 /// <remarks>This interface is typically used to manage and access a collection of permissions within a specific
 /// domain or module. The <see cref="Prefix"/> property can be used to identify the domain or module associated with the
 /// permissions.</remarks>
-public interface IPluginPermissions
+public interface IPluginPermissionCatalog
 {
     /// <summary>
     /// Gets the prefix used for categorizing or identifying related items.
