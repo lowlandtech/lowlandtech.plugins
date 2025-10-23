@@ -8,7 +8,7 @@
 /// on a database, ensuring that all changes are saved atomically.</remarks>
 /// <typeparam name="TReq">The type of the request.</typeparam>
 /// <typeparam name="TRes">The type of the response.</typeparam>
-public sealed class UnitOfWorkBehavior<TReq, TRes>(DbContext db) : IPipelineBehavior<TReq, TRes>
+public sealed class UnitOfWorkBehavior<TReq, TRes>(DbContext db) : IPipelineBehavior<TReq, TRes> where TReq : notnull, new()
 {
     /// <summary>
     /// Represents the database context used for accessing and managing the database.

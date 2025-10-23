@@ -5,7 +5,7 @@
 /// </summary>
 /// <typeparam name="TReq">The type of the request.</typeparam>
 /// <typeparam name="TRes">The type of the response.</typeparam>
-public sealed class IdempotencyBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes>
+public sealed class IdempotencyBehavior<TReq, TRes> : IPipelineBehavior<TReq, TRes> where TRes : class where TReq : notnull
 {
     /// <summary>
     /// Processes the specified request asynchronously and returns the result.
