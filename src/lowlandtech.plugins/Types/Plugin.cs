@@ -5,6 +5,9 @@
 /// </summary>
 public abstract class Plugin : IPlugin
 {
+    /// <summary>
+    /// Initializes a new instance of the <see cref="Plugin"/> class.
+    /// </summary>
     protected Plugin()
     {
         // If a PluginId attribute exists on the concrete type, use it to set the Id.

@@ -11,7 +11,7 @@ public static class PluginExtensions
         // Build service provider to access configuration and logging
         // Note: This creates a temporary provider; the real one is built later by the caller
         var provider = services.BuildServiceProvider();
-
+        var mvcBuilder = services.AddControllers();
         // Try to obtain an ILoggerFactory from the registered services; fall back to a temporary factory if none is registered
         var factory = provider.GetService<ILoggerFactory>();
         
@@ -40,6 +40,7 @@ public static class PluginExtensions
             try
             {
                 services.AddPlugin(plugin);
+                mvcBuilder.AddApplicationPart(plugin.GetType().Assembly);
             }
             catch (Exception ex)
             {

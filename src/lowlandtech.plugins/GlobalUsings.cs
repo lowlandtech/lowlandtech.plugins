@@ -9,3 +9,7 @@ global using Microsoft.Extensions.Logging;
 global using System.Reflection;
 global using System.Runtime.Loader;
 global using System.Text.Json.Serialization;
+global using MediatR;
+global using Microsoft.AspNetCore.Authorization;
+global using Microsoft.EntityFrameworkCore;
+global using Microsoft.Extensions.Options;
