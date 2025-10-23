@@ -6,9 +6,9 @@
     <IsPackable>true</IsPackable>
     <Company>LowlandTech</Company>
     <Authors>wendellmva</Authors>
-    <Copyright>Copyright © 2025 LowlandTech</Copyright>
-    <Version>2025.10.4</Version>
-    <PackageVersion>2025.10.4</PackageVersion>
+    <Copyright>Copyright Â© 2025 LowlandTech</Copyright>
+    <Version>2025.10.6</Version>
+    <PackageVersion>2025.10.6</PackageVersion>
     <PackageId>LowlandTech.Plugins.AspNetCore</PackageId>
     <Title>LowlandTech.Plugins.AspNetCore</Title>
     <Description>ASP.NET Core integrations for LowlandTech.Plugins</Description>
