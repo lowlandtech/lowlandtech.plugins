@@ -7,10 +7,10 @@
     <IsPackable>true</IsPackable>
     <Company>LowlandTech</Company>
     <Authors>wendellmva</Authors>
-    <Copyright>Copyright Ãƒâ€šÃ‚Â© 2025 LowlandTech</Copyright>
+    <Copyright>Copyright ÃƒÆ’Ã¢â‚¬Å¡Ãƒâ€šÃ‚Â© 2025 LowlandTech</Copyright>
     <!-- Versioning (update as appropriate) -->
-    <Version>2025.10.4</Version>
-    <PackageVersion>2025.10.4</PackageVersion>
+    <Version>2025.10.5</Version>
+    <PackageVersion>2025.10.5</PackageVersion>
     <PackageId>LowlandTech.Plugins</PackageId>
     <Title>LowlandTech.Plugins</Title>
     <Description>Plugin discovery, registration and lifecycle helpers for LowlandTech projects.</Description>
